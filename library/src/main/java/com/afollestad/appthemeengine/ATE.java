@@ -78,6 +78,14 @@ public final class ATE extends ATEBase {
     private static boolean didValuesChange(@NonNull Context context, long updateTime, @Nullable String key) {
         return ATE.config(context, key).isConfigured() && Config.prefs(context, key).getLong(Config.VALUES_CHANGED, -1) > updateTime;
     }
+    @NonNull
+    static private Bitmap getBitmapFromDrawable(@NonNull Drawable drawable) {
+        final Bitmap bmp = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(bmp);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bmp;
+    }
 
     public static boolean invalidateActivity(final @NonNull Activity activity, long updateTime, @Nullable String ateKey) {
         if (ATE.didValuesChange(activity, updateTime, ateKey)) {
@@ -246,7 +254,7 @@ public final class ATE extends ATEBase {
         color = ATEUtil.stripAlpha(color);
         // Default is app's launcher icon
         if (icon == null)
-            icon = ((BitmapDrawable) activity.getApplicationInfo().loadIcon(activity.getPackageManager())).getBitmap();
+        icon = getBitmapFromDrawable(activity.getApplicationInfo().loadIcon(activity.getPackageManager()));
 
         // Sets color of entry in the system recents page
         ActivityManager.TaskDescription td = new ActivityManager.TaskDescription(
